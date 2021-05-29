@@ -1,0 +1,237 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: arial; 
+    text-decoration: none;
+}
+
+section{
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+    perspective: 900px;
+}
+
+
+.libros1{  
+    width: 100%;
+    background: white;
+
+    padding: 5px;
+    margin-top: -10%;
+
+
+    padding-bottom: 20px;
+    transition: all 600ms ease;
+    transform: rotateX(40deg) scale(0.7);
+    box-shadow: 0px 20px 50px -10px #000;
+}
+.libros1:hover{
+    cursor: pointer;
+    transform: rotateX(0deg) scale(1) translateY(10px);
+}
+.libros1 img{
+    width: 100%;
+}
+
+
+
+
+.datos{
+    padding: 5px;    
+}
+
+.datos h2{
+    color: #0E3147;
+}
+.datos h3{
+    color: #1C8D19;
+    font-size: 10px;
+}
+
+
+
+
+
+
+
+body {
+  /* background: radial-gradient(90deg,#7a7a7a7a ,white); aqui hacemos el degradado de color */
+  background-image: url(https://www.xtrafondos.com/descargar.php?id=3934&resolucion=3840x2160);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+header{
+    width:100%;
+    height: 90px;
+    background:linear-gradient(60deg,#7a7a7a7a, white); /*aqui hacemos el degradado de color*/
+}
+#logo{
+    margin-top: 10px;
+    margin-left: 50px;
+    width: 200px;
+    height: 150px;
+    float: left;
+    
+}
+#logo img{
+    width: 105%;
+    
+}
+
+.hi{
+    margin-top: 0px;
+    margin-left: 250px;
+    font-size: 10px;
+    color: #0E3147;
+}
+
+
+.menu{
+    width: auto;
+    float: right;
+    margin-left: 0.8%;
+    margin-top:35px;/*aqui separamos los espacios entre arriba y abajo del menu, lo centramos.*/  
+}
+ 
+.menu ul{
+    display: flex;  /* aqui convertimos la lista vertical del menu, en un plano horizontal.*/
+}
+.menu li{
+    list-style: none; /* aqui quitamos los puntos que habian sobre las opciones del menu.*/ 
+}
+.menu li a{
+    /*font:oblique bold 120% cursive;*/
+    text-decoration:none;
+    color: #1A5F7B;
+    font-size: 22px;
+    margin-left: -6%;
+    
+    padding:42px; 
+} 
+.menu li a:hover{
+    color: black; /*aqui seleccionamos el color que se va a resaltar sobre las opciones del menú cuando pasemos el cursor*/
+}
+#check{
+    display:none;
+}
+.icon-menu{
+    display:none;
+}
+#check:checked ~ .menu{height: 610px;
+}
+
+@media screen and (max-width:900px){
+    .icon-menu{
+        display:block;
+        color:white;
+        float: right;
+        padding: 3px;
+        font-size: 35px;
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-right: 10px;
+    }
+    .icon-menu:hover{
+        background: #0E3147; /*aqui seleccionamos el color que se va a resaltar sobre el icono menú cuando pasemos el cursor*/
+        cursor: pointer;
+    }
+    .menu{
+        float: left;
+        margin-top: 10% ;
+        margin-left: 0%;
+        width:100%;
+        background:#0E3147; /*aqui seleccionamos el color en el que apareceran las opciones del desplegable*/
+        height:0px; 
+        overflow: hidden;
+        transition: all 300ms;
+        
+    }
+    .menu ul{
+        flex-direction: column;
+    }
+    .menu li a{
+        display: block;
+    }
+     #logo{
+         display: none;
+     }
+    section{
+        height: 300px;
+        width: 100%; 
+        border: 1px solid red;
+        padding: 40px;
+        display: block;
+    }
+
+     
+}
+
+
+
+.main header .iconShopping{
+	cursor: pointer;
+	position: relative;
+    font-size: 30px;
+}
+.main header .iconShopping p{
+	position: absolute;
+	right: 20px;
+	font-size: 1.2rem;
+    border-radius: 50%;
+    color: #F1F3F3;
+}
+
+/*cart box*/
+.cartBox{
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.8);
+	z-index: 99999;
+	transition: 0.3s linear;
+	transform: scale(0);
+}
+.cartBox.active{
+	transform: scale(1);
+}
+.cartBox .cart{
+	position: relative;
+	height: 70%;
+	width: 80%;
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.cartBox .cart i{
+	position: absolute;
+	right: 0;
+	top: 0;
+	background:#f00;
+	padding:10px 15px;
+	color: #fff;
+	cursor: pointer;
+}
+.cartBox .cart i:hover{
+	background: #ff0000a5;
+}
+.cartBox .cart h1{
+	position: relative;
+	margin-top: 2%;
+	font-size: 2.8rem;
+	color: #017bf5;
+}
+
+
