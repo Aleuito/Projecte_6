@@ -20,6 +20,10 @@ public class CursFamiliar extends CursosEsqui {
         this.carnet = carnet;
     }
 
+    public CursFamiliar(String idCurs, String NomCurs) {
+        super(idCurs, NomCurs);
+    }
+
     public String getCarnet() {
         return carnet;
     }
@@ -45,13 +49,13 @@ public class CursFamiliar extends CursosEsqui {
         
         try{
         
-        String consulta = "INSERT INTO compra (dni, id_curs, data_compra, hores, descompte, preu_final) VALUES "
-                + "'"+idCurs+"', "
+        String consulta = "INSERT INTO compra (dni, id_curs, hores, descompte, preu_final, data_compra) VALUES ("
                 + "'"+dni+"', "
-                + "'"+datacompra+"', "
+                + "'"+idCurs+"', "
                 + "'"+hores+"', "
                 + "'"+descompte+"', "
                 + "'"+preu_final+"', "
+                + "'"+datacompra+"'"
                 +")";
         
         Statement sentencia = conexio.createStatement();

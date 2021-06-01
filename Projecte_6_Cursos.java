@@ -2,7 +2,6 @@
 package projecte_6_cursos;
 
 //realizando los imports necesarios
-import com.sun.org.apache.xml.internal.security.signature.ObjectContainer;
 import java.sql.Connection;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -29,6 +28,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import java.sql.Statement;
+import java.sql.SQLException;
+import static projecte_6_cursos.CursosEsqui.p;
 
 public class Projecte_6_Cursos extends Application {
     
@@ -53,9 +55,6 @@ public class Projecte_6_Cursos extends Application {
     
     //creem el hashmap on guardarem tots els cursos llogats del dia
     HashMap <CursosEsqui, Integer> llistat = new HashMap <CursosEsqui, Integer> ();
-    
-    //creem base de dades d'objectes
-    ObjectContainer db = Db4oEmbedded.openFile("Cursos.db4o");
     
     //declarem les dos observable list que farem servir
     private ObservableList<Persona> perPersona;
@@ -384,7 +383,7 @@ public class Projecte_6_Cursos extends Application {
             alert.showAndWait();
     }
     
-    //Accio al cliacar Alquilar 
+    //Accio al clicar Alquilar 
     public void Alquilar(){
         
         int hora = 0;
@@ -399,15 +398,19 @@ public class Projecte_6_Cursos extends Application {
         
         if (una.isSelected()){
             hora = 1;
+            descompte = 20;
         }
         if (dos.isSelected()){
             hora = 2;
+            descompte = 20;
         }
         if (tres.isSelected()){
             hora = 3;
+            descompte = 30;
         }
         if (dia.isSelected()){
             hora = 7;
+            descompte = 50;
         }
         //comprovem si l'id del curs existeix a la base de dades
         if(curs.comprovarIdCurso(conexio, idCurs)){
@@ -415,8 +418,6 @@ public class Projecte_6_Cursos extends Application {
             if(p.comprovarDni(conexio, dni)){
                 //calculem el preu del curs a partit de les seleccions realitzades
                 preu = curs.getPreu(conexio, idCurs, hora, dni);
-                //agafem el descompet en el cas que tingui descompte
-                descompte = curs.obtenirDescompte(conexio, idCurs);
                 //si la funcio getPreu no es 0, realitzi les accions següents
                 if (preu!=0){
                     //mostrem missatge de curs llogat correctament
@@ -425,6 +426,17 @@ public class Projecte_6_Cursos extends Application {
                     alert.setTitle("INFORMACIO");
                     alert.setContentText("Moltes gracies. Acaba de llogar el Curs "+idCurs+" amb un cost de "+preu);
                     alert.showAndWait();
+                    //Mirem si te el familiar per aplicar el 40% adicional
+                    String curset = idCurs.substring(0, 4);
+                    if(curset.equals("CFAM")){
+                        String carnet_familiar = p.carnetFamiliar(conexio, dni);
+                        if(carnet_familiar==null){
+                            descompte = descompte;
+                        }else if(carnet_familiar.equals("CFAM2021")){
+                            descompte= descompte+40;
+                            }
+                    }
+                    
                     //Creem l'objecte curs on es guarda linformacio del curs llogat
                     curs = new CursFamiliar (idCurs, dni, String.valueOf(LocalDate.now()), hora, descompte, preu);
                     //Afegim el curs al hashmap per després poder recorrer-lo i obtenir les dades dels cursos
@@ -475,41 +487,65 @@ public class Projecte_6_Cursos extends Application {
     }
     
     public void tancar(){
+  
         //declaracio variables necessaries
         int contador;
         int valor = 0;
+        
         CursosEsqui definitiu = new CursFamiliar();
+        
         //creem un iterador per poder recorrer el hashmap mitjançant la clau
         Iterator<CursosEsqui> cursos = llistat.keySet().iterator();
+        
         //while per recorrer el hash map
         while(cursos.hasNext()){
+            
             //agafem el curs en CURS i el numero de cops que esta llogat en contador
             curs = cursos.next();
             contador = llistat.get(curs);
+            
             //bucle per agafar el curs més llogat del dia
             if ( contador > valor){
                 valor = contador;
                 definitiu = curs;
             }
-            //guardem el curs mes llogat del dia a la base de dades d'objectes
-            db.store(definitiu);
+            
             //agafem substring per comprovar quin curs es
             String principal = curs.getIdCurs().substring(0, 4);
+            
             //setencies per guardar el curs a la base de dades relacional
             if (principal.equals("CFAM")){
-                curs = new CursFamiliar();
-                curs.llogarCurs(conexio, curs.getIdCurs(), curs.getDni(), curs.getDatacompra(), curs.getHores(), curs.getDescompte(), curs.getPreu_final());
+                
+                CursFamiliar noucurs = (CursFamiliar)curs;
+                noucurs.llogarCurs(conexio, noucurs.getIdCurs(), noucurs.getDni(), noucurs.getDatacompra(), noucurs.getHores(), noucurs.getDescompte(), noucurs.getPreu_final());
+            
             }else if(principal.equals("CFED")){
-                curs = new CursCompeticio();
-                curs.llogarCurs(conexio, curs.getIdCurs(), curs.getDni(), curs.getDatacompra(), curs.getHores(), 0, curs.getPreu_final());
+                
+                CursFamiliar noucurs = (CursFamiliar)curs;
+                noucurs.llogarCurs(conexio, noucurs.getIdCurs(), noucurs.getDni(), noucurs.getDatacompra(), noucurs.getHores(), 0, noucurs.getPreu_final());
             }
-        }  
-        //tanquem la base de dades d'objectes
-        db.close();
+        }
+
+        try{
+            Statement conn = SQLOracle.conn();
+
+            //cridem metode que ens retorna el curs
+            curs = curs.cursmesllogat(definitiu.getIdCurs());
+            
+            System.out.println(curs.getIdCurs());
+            System.out.println(curs.getNomCurs());
+            
+            String consulta = "INSERT INTO cursos_llogats VALUES ('"+String.valueOf(LocalDate.now())+"', Cursos('"+curs.getIdCurs()+"', '"+curs.getNomCurs()+"'))";
+
+            conn.execute(consulta);
+            
+        }catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+       
         //tanquem l'aplicació 
         Platform.exit();
         System.exit(0);
         
     }       
 }
-

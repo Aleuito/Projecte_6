@@ -46,9 +46,14 @@ public abstract class CursosEsqui {
         this.hores = hores;
         this.preu_final = preu_final;
     }
+
+    public CursosEsqui(String idCurs, String NomCurs) {
+        this.idCurs = idCurs;
+        this.NomCurs = NomCurs;
+    }
     
     public CursosEsqui() {
-    } 
+    }
 
     public String getIdCurs() {
         return idCurs;
@@ -219,16 +224,19 @@ public abstract class CursosEsqui {
             
             if (carnet_familiar==null){
                 try{
+                    
+                    Double preu = 0.0;
+                    
                     String consulta1 = "SELECT preu_hora FROM cursos WHERE id_curs = '"+id+"'";
 
                     Statement sentencia1 = conexio.createStatement();
                     ResultSet resultat1 = sentencia1.executeQuery(consulta1);
 
-                    resultat1.next();
+                    while (resultat1.next()){
+                        preu = resultat1.getDouble("preu_hora");  
+                    }
                     
-                    Double preu = resultat1.getDouble("preu_hora");
-
-                    preu_final = hores*preu;
+                    preu_final = PreuTotal (hores, preu);
 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -236,21 +244,21 @@ public abstract class CursosEsqui {
                 
             }else   if(carnet_familiar.equals("CFAM2021")){
                         try{
-
-                            Double descompte = obtenirDescompte(conexio, id);
-
+                            Double preu = 0.0;
+                            
                             String consulta1 = "SELECT preu_hora FROM cursos WHERE id_curs = '"+id+"'";
 
                             Statement sentencia1 = conexio.createStatement();
                             ResultSet resultat1 = sentencia1.executeQuery(consulta1);
 
-                            resultat1.next();
-
-                            Double preu = resultat1.getDouble("preu_hora");
-
-                            double precio = hores*preu;
-
-                            preu_final = precio - ((precio*descompte)/100);
+                            while (resultat1.next()){
+                                preu = resultat1.getDouble("preu_hora");  
+                            }
+                            
+                            preu_final = PreuTotal (hores, preu);
+                            
+                            double descFam = 40;
+                            preu_final = preu_final-((preu_final*descFam)/100);
 
                         } catch (SQLException ex) {
                             ex.printStackTrace();
@@ -271,17 +279,18 @@ public abstract class CursosEsqui {
                 
             }else if (carnetFederat.equals(carnetCurs)){
                         try{
-
+                            Double preu = 0.0;
+                            
                             String consulta1 = "SELECT preu_hora FROM cursos WHERE id_curs = '"+id+"'";
 
                             Statement sentencia1 = conexio.createStatement();
                             ResultSet resultat1 = sentencia1.executeQuery(consulta1);
 
-                            resultat1.next();
+                            while (resultat1.next()){
+                                preu = resultat1.getDouble("preu_hora");  
+                            }
 
-                            Double preu = resultat1.getDouble("preu_hora");
-
-                            preu_final = hores*preu;
+                            preu_final = PreuTotal (hores, preu);
 
                         } catch (SQLException ex) {
                             ex.printStackTrace();
@@ -319,26 +328,49 @@ public abstract class CursosEsqui {
         } 
         return carnet;
     }
-    
-    public double obtenirDescompte(Connection conexio, String id){
+    //Metode calcular preu hora amb descompte de les hores
+    public double PreuTotal(int hora, double preu){
         
+        double preu_total = 0;
         double descompte = 0;
-       
+        
+        if(hora==1 || hora==2){
+            descompte = 20;
+        }else if(hora==3){
+            descompte = 30;
+        } else if(hora==7){
+            descompte = 50;
+        }
+        
+        double preuDes = (hora*preu); 
+        preu_total = preuDes-((preuDes*descompte)/100);
+        return preu_total;
+    }
+    
+    
+    public CursosEsqui cursmesllogat(String id){
+        
+        CursosEsqui cmllogat = new CursFamiliar("", "");
+        
         try{
         
-            String consulta = "SELECT descompte FROM familiar WHERE id_curs = '"+id+"'";
+            String consulta = "SELECT * FROM cursos WHERE id_curs = '"+id+"'";
 
             Statement sentencia = conexio.createStatement();
             ResultSet resultat = sentencia.executeQuery(consulta);
 
             if(resultat.next()){
-                descompte = resultat.getDouble("descompte");
+                String idCurs = resultat.getString("id_curs");
+                String nomCurs = resultat.getString("nom");
+                
+                cmllogat = new CursFamiliar (idCurs, nomCurs);
             }
         
         } catch (SQLException ex) {
             ex.printStackTrace();
         } 
-        return descompte;
+        
+        return cmllogat;
     }
     
 }

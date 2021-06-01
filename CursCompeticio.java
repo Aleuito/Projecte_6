@@ -9,9 +9,11 @@ import java.sql.Statement;
 public class CursCompeticio extends CursosEsqui {
     
     private String carnet_federat;
+    private double descompte;
 
-    public CursCompeticio(String idCurs, String dni, String datacompra, int hores, double preu_final) {
+    public CursCompeticio(String idCurs, String dni, String datacompra, int hores, double descompte, double preu_final) {
         super(idCurs, dni, datacompra, hores, preu_final);
+        this.descompte = descompte;
     }
 
     public CursCompeticio() {
@@ -31,13 +33,13 @@ public class CursCompeticio extends CursosEsqui {
         
         try{
         
-        String consulta = "INSERT INTO compra (dni, id_curs, data_compra, hores, preu_final) VALUES "
-                + "'"+idCurs+"', "
+        String consulta = "INSERT INTO compra (dni, id_curs, hores, descompte, preu_final, data_compra) VALUES ("
                 + "'"+dni+"', "
-                + "'"+datacompra+"', "
+                + "'"+idCurs+"', "
                 + "'"+hores+"', "
                 + "'"+0+"', "
                 + "'"+preu_final+"', "
+                + "'"+datacompra+"'"
                 +")";
         
         Statement sentencia = conexio.createStatement();
